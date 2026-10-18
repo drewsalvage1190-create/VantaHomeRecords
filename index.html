@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>VANTA HOME RECORDS</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#0b0a10;color:#f7f3ff;font-family:Arial,sans-serif}
+button{cursor:pointer;font:inherit}
+.sidebar{position:fixed;inset:0 auto 0 0;width:220px;padding:25px 15px;background:#100e17;border-right:1px solid #30283e}
+.logo{font-size:19px;font-weight:bold;letter-spacing:2px}
+.logo small{display:block;color:#b49aff;font-size:10px;letter-spacing:4px;margin-top:6px}
+.label{font-size:10px;color:#968ba9;letter-spacing:2px;margin:35px 10px 12px}
+.nav{display:block;width:100%;text-align:left;border:0;background:none;color:#a7a0b6;padding:13px 10px;border-radius:8px;margin:3px 0}
+.nav:hover,.nav.active{background:#2a213a;color:white}
+.nav.active{box-shadow:inset 3px 0 #b49aff}
+.main{margin-left:220px}
+.top{height:70px;border-bottom:1px solid #30283e;display:flex;align-items:center;justify-content:space-between;padding:0 28px;color:#a7a0b6;font-size:12px}
+.content{max-width:1100px;margin:auto;padding:30px}
+.hero{padding:30px;border:1px solid #40324f;border-radius:16px;background:radial-gradient(ellipse at top right,#39264c,transparent 60%),#17131f}
+.eyebrow{font-size:10px;letter-spacing:3px;color:#b49aff}
+h1{font-size:34px;margin:13px 0}
+p{color:#aaa2b9;line-height:1.6}
+button.action{border:0;border-radius:8px;padding:12px 16px;background:#b49aff;color:#171020;font-weight:bold;margin:10px 7px 0 0}
+button.secondary{background:#292235;color:white}
+h2{font-size:19px;margin-top:30px}
+.grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;margin-top:16px}
+.card{background:#15121d;border:1px solid #30283e;border-radius:11px;padding:18px}
+.card .num{font-size:28px;font-weight:bold;margin-top:14px}
+.card p{font-size:12px}
+.small{font-size:10px;color:#a7a0b6;letter-spacing:1px}
+#page{min-height:300px}
+@media(max-width:750px){
+.sidebar{position:relative;width:100%;height:auto;border-right:0;border-bottom:1px solid #30283e;padding:16px}
+.sidebar .label,.sidebar .extra{display:none}
+.sidebar nav{display:grid;grid-template-columns:repeat(2,1fr);gap:3px}
+.main{margin:0}
+.content{padding:18px}
+.grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+h1{font-size:28px}
+}
+</style>
+</head>
+<body>
+<aside class="sidebar">
+<div class="logo">VANTA HOME<small>RECORDS</small></div>
+<div class="label">WORKSPACE</div>
+<nav>
+<button class="nav active" data-page="Home">⌂ Home</button>
+<button class="nav" data-page="Artists">♙ Artists</button>
+<button class="nav" data-page="Auditions">♫ Auditions</button>
+<button class="nav" data-page="Music Projects">▤ Music Projects</button>
+<button class="nav" data-page="Video Production">▷ Video Production</button>
+<button class="nav" data-page="Staff Dashboard">✧ Staff Dashboard</button>
+<button class="nav" data-page="Settings">⚙ Settings</button>
+</nav>
+<div class="extra" style="margin-top:35px;color:#8e849f;font-size:12px;line-height:1.7">YOUR CREATIVE HOME<br>Dream bigger. Create together.<br><br>VANTA HOME RECORDS ©</div>
+</aside>
+<div class="main">
+<header class="top"><span id="crumb">WORKSPACE / HOME</span><span>STUDIO HQ &nbsp; ◉</span></header>
+<main class="content" id="page">
+<div class="hero">
+<div class="eyebrow">YOUR LABEL. YOUR VISION.</div>
+<h1>Welcome to your<br>creative headquarters.</h1>
+<p>One home for your artists, auditions, music releases and video projects. Build your label one idea at a time.</p>
+<button class="action" data-go="Artists">Manage artists ↗</button>
+<button class="action secondary" data-go="Auditions">View auditions</button>
+</div>
+<h2>Your studio at a glance</h2>
+<div class="grid">
+<div class="card"><div class="small">ARTISTS</div><div class="num" id="artistCount">0</div><p>Artist profiles</p></div>
+<div class="card"><div class="small">AUDITIONS</div><div class="num" id="auditionCount">0</div><p>Applications</p></div>
+<div class="card"><div class="small">MUSIC PROJECTS</div><div class="num" id="musicCount">0</div><p>Songs and albums</p></div>
+<div class="card"><div class="small">VIDEO PROJECTS</div><div class="num" id="videoCount">0</div><p>Video concepts</p></div>
+</div>
+<h2>Welcome to VANTA</h2>
+<p>Choose a section from the menu to get started.</p>
+</main>
+</div>
+<script>
+const page=document.getElementById('page');
+const names=['Home','Artists','Auditions','Music Projects','Video Production','Staff Dashboard','Settings'];
+function show(name){
+document.querySelectorAll('.nav').forEach(b=>b.classList.toggle('active',b.dataset.page===name));
+document.getElementById('crumb').textContent='WORKSPACE / '+name.toUpperCase();
+if(name==='Home'){location.reload();return;}
+page.innerHTML='<div class="eyebrow">VANTA HOME RECORDS</div><h1>'+name+'</h1><p>This section is ready for us to build in the next step.</p><button class="action" onclick="show(\'Home\')">← Back to Home</button>';
+}
+document.querySelectorAll('[data-page]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.page)));
+document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=>show(b.dataset.go)));
+</script>
+</body>
+</html>
