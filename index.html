@@ -93,3 +93,226 @@ document.querySelectorAll('[data-go]').forEach(b=>b.addEventListener('click',()=
 </script>
 </body>
 </html>
+
+<script>
+const page = document.getElementById('page');
+
+function show(name) {
+  document.querySelectorAll('.nav').forEach(b => {
+    b.classList.toggle('active', b.dataset.page === name);
+  });
+
+  document.getElementById('crumb').textContent =
+    'WORKSPACE / ' + name.toUpperCase();
+
+  const pages = {
+    'Home': `
+      <div class="hero">
+        <div class="eyebrow">YOUR LABEL. YOUR VISION.</div>
+        <h1>Welcome back to VANTA.</h1>
+        <p>Your creative headquarters.</p>
+        <button class="action" data-go="Artists">Manage artists ↗</button>
+        <button class="action secondary" data-go="Music Projects">Music projects</button>
+      </div>
+    `,
+
+    'Artists': `
+      <div class="eyebrow">YOUR TALENT ROSTER</div>
+      <h1>Artists</h1>
+      <p>Keep track of the talent signed to your label.</p>
+      <div class="card">
+        <h3>Add an artist</h3>
+        <input id="artistName" placeholder="Artist or group name">
+        <button class="action" onclick="addItem('artists','artistName','artistList')">+ Add artist</button>
+      </div>
+      <div id="artistList"></div>
+    `,
+
+    'Auditions': `
+      <div class="eyebrow">DISCOVER NEW TALENT</div>
+      <h1>Auditions</h1>
+      <p>Record audition applicants here.</p>
+      <div class="card">
+        <input id="auditionName" placeholder="Applicant name">
+        <input id="auditionRole" placeholder="Position (vocalist, dancer...)">
+        <button class="action" onclick="addItem('auditions','auditionName','auditionList','auditionRole')">+ Add applicant</button>
+      </div>
+      <div id="auditionList"></div>
+    `,
+
+    'Music Projects': `
+      <div class="eyebrow">FROM IDEA TO RELEASE</div>
+      <h1>Music Projects</h1>
+      <p>Organise your songs, singles and albums.</p>
+      <div class="card">
+        <input id="musicName" placeholder="Song or album title">
+        <select id="musicType">
+          <option>Single</option><option>Album</option>
+          <option>Mini album</option><option>Demo</option>
+        </select>
+        <button class="action" onclick="addItem('music','musicName','musicList','musicType')">+ Add project</button>
+      </div>
+      <div id="musicList"></div>
+    `,
+
+    'Video Production': `
+      <div class="eyebrow">VISUALISE YOUR VISION</div>
+      <h1>Video Production</h1>
+      <p>Plan music videos, teasers and other content.</p>
+      <div class="card">
+        <input id="videoName" placeholder="Video project name">
+        <select id="videoType">
+          <option>Music video</option><option>Teaser</option>
+          <option>Short-form video</option><option>Behind the scenes</option>
+        </select>
+        <button class="action" onclick="addItem('videos','videoName','videoList','videoType')">+ Add video</button>
+      </div>
+      <div id="videoList"></div>
+    `,
+
+    'Staff Dashboard': `
+      <div class="eyebrow">THE TEAM BEHIND THE LABEL</div>
+      <h1>Staff Dashboard</h1>
+      <p>Keep a basic list of your studio team.</p>
+      <div class="card">
+        <input id="staffName" placeholder="Staff member name">
+        <input id="staffRole" placeholder="Department or role">
+        <button class="action" onclick="addItem('staff','staffName','staffList','staffRole')">+ Add staff member</button>
+      </div>
+      <div id="staffList"></div>
+      <p>This is a basic list, not a private or secure staff login.</p>
+    `,
+
+    'Settings': `
+      <div class="eyebrow">MAKE IT YOURS</div>
+      <h1>Settings</h1>
+      <div class="card">
+        <h3>Studio identity</h3>
+        <p>VANTA HOME RECORDS</p>
+        <p>Dream bigger. Create together.</p>
+      </div>
+      <div class="card">
+        <h3>Data</h3>
+        <p>Your lists are saved in this browser on this device.</p>
+        <button class="action secondary" onclick="if(confirm('Clear ALL saved studio lists?')) clearStudio()">Clear studio data</button>
+      </div>
+    `
+  };
+
+  page.innerHTML = pages[name] || pages.Home;
+  renderAll();
+}
+
+function getItems(key) {
+  try {
+    return JSON.parse(localStorage.getItem('vanta_' + key)) || [];
+  } catch {
+    return [];
+  }
+}
+
+function addItem(key, inputId, listId, extraId) {
+  const input = document.getElementById(inputId);
+  const extra = extraId ? document.getElementById(extraId) : null;
+  const name = input.value.trim();
+
+  if (!name) {
+    alert('Please enter a name first!');
+    return;
+  }
+
+  const items = getItems(key);
+  items.push({
+    name,
+    extra: extra ? extra.value : ''
+  });
+
+  localStorage.setItem('vanta_' + key, JSON.stringify(items));
+  input.value = '';
+  if (extra && extra.tagName === 'INPUT') extra.value = '';
+
+  renderList(key, listId);
+  updateCounts();
+}
+
+function renderList(key, listId) {
+  const list = document.getElementById(listId);
+  if (!list) return;
+
+  const items = getItems(key);
+  list.innerHTML = '';
+
+  if (!items.length) {
+    list.innerHTML = '<p>Nothing added yet. Your next idea starts here!</p>';
+    return;
+  }
+
+  items.forEach((item, index) => {
+    const card = document.createElement('div');
+    card.className = 'card';
+    const title = document.createElement('h3');
+    title.textContent = item.name;
+    card.appendChild(title);
+
+    if (item.extra) {
+      const detail = document.createElement('p');
+      detail.textContent = item.extra;
+      card.appendChild(detail);
+    }
+
+    const remove = document.createElement('button');
+    remove.className = 'action secondary';
+    remove.textContent = 'Remove';
+    remove.onclick = () => {
+      const updated = getItems(key);
+      updated.splice(index, 1);
+      localStorage.setItem('vanta_' + key, JSON.stringify(updated));
+      renderAll();
+    };
+
+    card.appendChild(remove);
+    list.appendChild(card);
+  });
+}
+
+function renderAll() {
+  renderList('artists', 'artistList');
+  renderList('auditions', 'auditionList');
+  renderList('music', 'musicList');
+  renderList('videos', 'videoList');
+  renderList('staff', 'staffList');
+  updateCounts();
+}
+
+function updateCounts() {
+  const counts = {
+    artistCount: 'artists',
+    auditionCount: 'auditions',
+    musicCount: 'music',
+    videoCount: 'videos'
+  };
+
+  Object.entries(counts).forEach(([id, key]) => {
+    const element = document.getElementById(id);
+    if (element) element.textContent = getItems(key).length;
+  });
+}
+
+function clearStudio() {
+  ['artists', 'auditions', 'music', 'videos', 'staff'].forEach(key => {
+    localStorage.removeItem('vanta_' + key);
+  });
+  renderAll();
+}
+
+document.querySelectorAll('[data-page]').forEach(button => {
+  button.addEventListener('click', () => show(button.dataset.page));
+});
+
+document.addEventListener('click', event => {
+  const button = event.target.closest('[data-go]');
+  if (button) show(button.dataset.go);
+});
+
+renderAll();
+</script>
